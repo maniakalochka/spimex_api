@@ -32,6 +32,6 @@ async def get_db():
 
 
 async def init_db() -> None:
-    """Init database tables"""
+    """Better use alembic"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

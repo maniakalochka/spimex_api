@@ -8,5 +8,9 @@ load_dotenv(dotenv_path=env_path)
 class Settings(BaseSettings):
     DB_URL: str
 
+    class Config:
+        env_file = env_path
+        env_file_encoding = 'utf-8'
+        case_sensitive = True
 
 settings = Settings() # type: ignore
