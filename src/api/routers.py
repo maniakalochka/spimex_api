@@ -28,13 +28,15 @@ async def get_dynamic(
         start_date=start_date,
         end_date=end_date)
 
-
-@spimex_router.get("/results")
-async def get_trading_results(
-    oil_id: int = Query(..., description="ID of the oil"),
-    delivery_type_id: int = Query(..., description="ID of the delivery type"),
-    delivery_basis_id: int = Query(..., description="ID of the delivery basis"),
-    start_date: str = Query(..., description="Start date in YYYY-MM-DD format"),
-    end_date: str = Query(..., description="End date in YYYY-MM-DD format")
+@spimex_router.get("/latest")
+async def get_latest_trading_results(
+    oil_id: str = Query(..., description="ID of the oil"),
+    delivery_type_id: str = Query(None, description="ID of the delivery type"),
+    delivery_basis_id: str = Query(None, description="ID of the delivery basis")
 ):
-    pass
+    repo = SpimexSQLRepository()
+    return await repo.get_trading_results(
+        oil_id=oil_id,
+        delivery_type_id=delivery_type_id,
+        delivery_basis_id=delivery_basis_id
+    )

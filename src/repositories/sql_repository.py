@@ -54,3 +54,34 @@ class SpimexSQLRepository(AbstractRepository):
 
             result = await session.execute(stmt)
             return result.scalars().all()
+
+
+    async def get_trading_results(
+        self,
+        oil_id: str,
+        delivery_type_id: str | None = None,
+        delivery_basis_id: str | None = None,
+    ) -> list[SpimexTradingResult]:
+        async with async_session() as session:
+            conditions = [self.model.oil_id == oil_id]
+
+            if delivery_type_id is not None:
+                conditions.append(self.model.delivery_type_id == delivery_type_id)
+
+            if delivery_basis_id is not None:
+                conditions.append(self.model.delivery_basis_id == delivery_basis_id)
+
+            last_date_subq = (
+                select(func.max(self.model.date))
+                .where(*conditions)
+                .scalar_subquery()
+            )
+
+            stmt = (
+                select(self.model)
+                .where(self.model.date == last_date_subq, *conditions)
+                .order_by(self.model.date)
+            )
+
+            result = await session.execute(stmt)
+            return result.scalars().all()
