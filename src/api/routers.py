@@ -17,8 +17,8 @@ async def get_dynamic(
     oil_id: str = Query(..., description="ID of the oil"),
     delivery_type_id: str= Query(None, description="ID of the delivery type"),
     delivery_basis_id: str = Query(None, description="ID of the delivery basis"),
-    start_date: datetime.datetime  = Query(None, description="Start date in YYYY-MM-DD format"),
-    end_date: datetime.datetime = Query(None, description="End date in YYYY-MM-DD format")
+    start_date: datetime.date  = Query(None, description="Start date in YYYY-MM-DD format"),
+    end_date: datetime.date = Query(None, description="End date in YYYY-MM-DD format")
 ):
     repo = SpimexSQLRepository()
     return await repo.get_dynamic(

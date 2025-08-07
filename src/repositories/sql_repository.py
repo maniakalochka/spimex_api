@@ -1,10 +1,9 @@
 from models.spimex import SpimexTradingResult
 from .base import AbstractRepository
 from sqlalchemy import select, distinct, desc, func, text
-from datetime import datetime
+from datetime import date
 
 from databases.db import async_session
-from calendar import Day
 
 
 
@@ -17,38 +16,41 @@ class SpimexSQLRepository(AbstractRepository):
 
         async with async_session() as session:
             stmt = (
-                select(self.mode)
+                select(self.model)
                 .where(func.DATE(self.model.date) == func.DATE(func.now() - text(f"INTERVAL '{n} days'"))) # type: ignore
                 .order_by(desc(self.model.date)) # type: ignore
         )
         result = await session.execute(stmt)
         return result.scalars().all()  # type: ignore
 
-    async def get_dynamic(self,
+    async def get_dynamic(
+        self,
         oil_id: str,
-        delivery_type_id: str,
-        delivery_basis_id: str,
-        start_date: datetime,
-        end_date: datetime) -> list[SpimexTradingResult]:
+        delivery_type_id: str | None = None,
+        delivery_basis_id: str | None = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> list[SpimexTradingResult]:
         async with async_session() as session:
-            start_date_subq = (
-                select(self.model.date)  # type: ignore
-                .order_by(desc(self.model.date))  # type: ignore
-                .limit(1)
+            conditions = [self.model.oil_id == oil_id]
+
+            if delivery_type_id is not None:
+                conditions.append(self.model.delivery_type_id == delivery_type_id)
+
+            if delivery_basis_id is not None:
+                conditions.append(self.model.delivery_basis_id == delivery_basis_id)
+
+            if start_date is not None:
+                conditions.append(self.model.date >= start_date)
+
+            if end_date is not None:
+                conditions.append(self.model.date <= end_date)
+
+            stmt = (
+                select(self.model)
+                .where(*conditions)
+                .order_by(self.model.date)
             )
-            end_date_subq = (
-                select(self.model.date)
-                .order_by((self.model.date))  # type: ignore
-                .limit(1)
-            )
-            stmt  = (
-                select(self.model)  # type: ignore
-                .where(self.model.date >= start_date_subq,
-                       self.model.date <= end_date_subq,
-                       self.model.oil_id == oil_id,
-                       self.model.delivery_type_id == delivery_type_id,
-                       self.model.delivery_basis_id == delivery_basis_id)
-                .order_by(self.model.date) # type: ignore
-            )
+
             result = await session.execute(stmt)
-            return result.scalars().all()  #type: ignore
+            return result.scalars().all()
