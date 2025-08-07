@@ -28,10 +28,6 @@ async def get_db():
             await session.rollback()
             raise e
         finally:
-            await session.close()
+            await session.clo
 
-
-async def init_db() -> None:
-    """Better use alembic"""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+SessionLocal = async_sessionmaker(engine)
