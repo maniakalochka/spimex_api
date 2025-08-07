@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession,
 from sqlalchemy.pool import NullPool
 
 from core.config import settings
-from models.base import Base
 
 DATABASE_URL = settings.DB_URL
 DATABASE_PARAMS = {"poolclass": NullPool}
@@ -28,6 +27,6 @@ async def get_db():
             await session.rollback()
             raise e
         finally:
-            await session.clo
+            await session.close()
 
 SessionLocal = async_sessionmaker(engine)

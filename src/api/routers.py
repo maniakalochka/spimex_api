@@ -1,7 +1,6 @@
 import datetime
 from fastapi import APIRouter, Query
 
-from models.spimex import SpimexTradingResult
 from repositories.sql_repository import SpimexSQLRepository
 from utils.cache.cache.redis_client import redis_cache
 
