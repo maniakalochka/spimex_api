@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 import uvicorn
-import asyncio
 from api.routers import spimex_router
 
 
@@ -13,10 +12,10 @@ from databases.db import engine  # предполагается, что engine �
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+
     uvicorn.run(
         app=app,
         host="localhost",
-        port=8000,
+        port=8001,
         reload=True,
     )

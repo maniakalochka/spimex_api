@@ -3,16 +3,19 @@ from fastapi import APIRouter, Query
 
 from models.spimex import SpimexTradingResult
 from repositories.sql_repository import SpimexSQLRepository
+from utils.cache.cache.redis_client import redis_cache
 
 spimex_router = APIRouter(tags=["spimex"])
 
 
 @spimex_router.get("/last_trading_dates/{n}")
+@redis_cache()
 async def get_last_trading_dates(n: int):
     repo = SpimexSQLRepository()
     return await repo.get_all(n)
 
 @spimex_router.get("/dynamic")
+@redis_cache()
 async def get_dynamic(
     oil_id: str = Query(..., description="ID of the oil"),
     delivery_type_id: str= Query(None, description="ID of the delivery type"),
@@ -29,6 +32,7 @@ async def get_dynamic(
         end_date=end_date)
 
 @spimex_router.get("/latest")
+@redis_cache()
 async def get_latest_trading_results(
     oil_id: str = Query(..., description="ID of the oil"),
     delivery_type_id: str = Query(None, description="ID of the delivery type"),
