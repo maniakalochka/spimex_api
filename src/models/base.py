@@ -11,11 +11,11 @@ class Base(DeclarativeBase):
 
     created_on: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
-        default=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
 
     updated_on: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
-        onupdate=lambda: datetime.datetime.now(datetime.timezone.utc)
+        onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
