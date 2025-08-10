@@ -1,45 +1,56 @@
-import datetime
-from fastapi import APIRouter, Query
+from datetime import date
+from typing import Annotated
 
+from fastapi import APIRouter, Depends
+
+from dependencies.deps import get_spimex_repo
 from repositories.sql_repository import SpimexSQLRepository
-from utils.cache.cache.redis_client import redis_cache
-
-spimex_router = APIRouter(tags=["spimex"])
 
 
-@spimex_router.get("/last_trading_dates/{n}")
-@redis_cache()
-async def get_last_trading_dates(n: int):
-    repo = SpimexSQLRepository()
-    return await repo.get_all(n)
+router = APIRouter(prefix="/spimex", tags=["spimex"])
 
-@spimex_router.get("/dynamic")
-@redis_cache()
-async def get_dynamic(
-    oil_id: str = Query(..., description="ID of the oil"),
-    delivery_type_id: str= Query(None, description="ID of the delivery type"),
-    delivery_basis_id: str = Query(None, description="ID of the delivery basis"),
-    start_date: datetime.date  = Query(None, description="Start date in YYYY-MM-DD format"),
-    end_date: datetime.date = Query(None, description="End date in YYYY-MM-DD format")
+
+@router.get("/last_trading_dates/{n}")
+async def get_last_trading_dates(
+    n: int,
+    repo: Annotated[SpimexSQLRepository, Depends(get_spimex_repo)],
 ):
-    repo = SpimexSQLRepository()
+    result = await repo.get_all(n)
+    if not result:
+        return {"message": f"Нет данных за указанные {n} дней."}
+    return result
+
+
+@router.get("/dynamics")
+async def get_dynamics(
+    repo: Annotated[SpimexSQLRepository, Depends(get_spimex_repo)],
+    oil_id: str,
+    delivery_type_id: str | None = None,
+    delivery_basis_id: str | None = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
+):
     return await repo.get_dynamic(
         oil_id=oil_id,
         delivery_type_id=delivery_type_id,
         delivery_basis_id=delivery_basis_id,
         start_date=start_date,
-        end_date=end_date)
+        end_date=end_date,
+    )
 
-@spimex_router.get("/latest")
-@redis_cache()
-async def get_latest_trading_results(
-    oil_id: str = Query(..., description="ID of the oil"),
-    delivery_type_id: str = Query(None, description="ID of the delivery type"),
-    delivery_basis_id: str = Query(None, description="ID of the delivery basis")
+
+
+@router.get("/trading_results")
+async def get_trading_results(
+    repo: Annotated[
+        SpimexSQLRepository, Depends(get_spimex_repo)
+    ],
+    oil_id: str,
+    delivery_type_id: str | None = None,
+    delivery_basis_id: str | None = None,
 ):
-    repo = SpimexSQLRepository()
     return await repo.get_trading_results(
         oil_id=oil_id,
         delivery_type_id=delivery_type_id,
-        delivery_basis_id=delivery_basis_id
+        delivery_basis_id=delivery_basis_id,
     )

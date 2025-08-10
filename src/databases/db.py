@@ -29,4 +29,5 @@ async def get_db():
         finally:
             await session.close()
 
+
 SessionLocal = async_sessionmaker(engine)

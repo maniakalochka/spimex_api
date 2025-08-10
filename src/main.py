@@ -1,14 +1,13 @@
-from fastapi import FastAPI
 import uvicorn
-from api.routers import spimex_router
+from fastapi import FastAPI
 
+from api.routers import router
+from middlwares.redis_mw import RedisCacheMiddleware
 
-app =  FastAPI()
+app = FastAPI()
+app.add_middleware(RedisCacheMiddleware)
 
-app.include_router(spimex_router)
-
-from models.base import Base
-from databases.db import engine  # предполагается, что engine уже настроен
+app.include_router(router)
 
 
 if __name__ == "__main__":
