@@ -26,7 +26,6 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
         key = _cache_key(request)
         logger.info("cache key=%s", key)
 
-        # HIT
         try:
             cached = await redis_client.get(key)
             if cached is not None:
@@ -37,21 +36,16 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.warning("Redis read error (%s): %s", key, e)
 
-        # MISS → получаем ответ от приложения
         response: Response = await call_next(request)
 
-        # Кэшируем только успешный JSON
         content_type = (response.headers.get("content-type") or "").lower()
         if response.status_code == 200 and content_type.startswith("application/json"):
-            # Считываем тело (асинхронный итератор) в bytes
             body_parts: List[bytes] = []
             async for chunk in response.body_iterator:  # type: ignore
                 body_parts.append(chunk)
             raw = b"".join(body_parts)
 
-            # Пишем в Redis
             try:
-                # валидируем JSON и нормализуем
                 payload = orjson.loads(raw)
                 await redis_client.set(
                     key, orjson.dumps(payload), ex=seconds_until_1411()
@@ -59,8 +53,6 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
             except Exception as e:
                 logger.warning("Redis write error (%s): %s", key, e)
 
-            # ВОЗВРАЩАЕМ НОВЫЙ Response, иначе старый уже «прочитан»
-            # Важно: пересобираем заголовки (кроме Transfer-Encoding) и content-type
             headers = dict(response.headers)
             headers.pop("content-length", None)  # пересчитается
             headers.pop("transfer-encoding", None)  # не копируем
@@ -71,6 +63,4 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
                 headers=headers,
                 background=response.background,
             )
-
-        # Не JSON / не 200 — отдаём как есть
         return response
