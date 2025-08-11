@@ -19,5 +19,5 @@ cd spimex_api
 poetry install
 . $(poetry env info --path)/bin/activate
 cd src
-uvicorn main:app --relod
+uvicorn main:app --reload
 ```
