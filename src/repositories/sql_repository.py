@@ -28,7 +28,7 @@ class SpimexSQLRepository(AbstractRepository):
             )
             res = await session.execute(stmt)
             items = list(res.scalars().all())
-            return [SpimexTradingResultOut.model_validate(it) for it in items]
+            return [SpimexTradingResultOut.model_validate(it) for it in items]  # type: ignore
 
     async def get_dynamic(
         self,
@@ -53,7 +53,7 @@ class SpimexSQLRepository(AbstractRepository):
             )
             res = await session.execute(stmt)
             items = list(res.scalars().all())
-            return [SpimexTradingResultOut.model_validate(it) for it in items]
+            return [SpimexTradingResultOut.model_validate(it) for it in items]  # type: ignore
 
     async def get_trading_results(
         self,
@@ -82,4 +82,4 @@ class SpimexSQLRepository(AbstractRepository):
 
             result = await session.execute(stmt)
             items = result.scalars().all()
-            return [SpimexTradingResultOut.model_validate(it) for it in items]
+            return [SpimexTradingResultOut.model_validate(it) for it in items]  # type: ignore
