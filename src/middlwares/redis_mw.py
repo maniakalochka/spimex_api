@@ -29,7 +29,7 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
             if cached is not None:
                 logger.info("cache HIT: %s", key)
                 payload = orjson.loads(cached)
-                return JSONResponse(payload)  # отдадим сразу, БД не трогаем
+                return JSONResponse(payload)
             logger.info("cache MISS: %s", key)
         except Exception as e:
             logger.warning("Redis read error (%s): %s", key, e)
@@ -52,8 +52,8 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
                 logger.warning("Redis write error (%s): %s", key, e)
 
             headers = dict(response.headers)
-            headers.pop("content-length", None)  # пересчитается
-            headers.pop("transfer-encoding", None)  # не копируем
+            headers.pop("content-length", None)
+            headers.pop("transfer-encoding", None)
             return Response(
                 content=raw,
                 status_code=response.status_code,
