@@ -10,8 +10,6 @@ from starlette.responses import JSONResponse, Response
 
 from utils.redis import (
     _cache_key,
-    _normalize_query,
-    _normalized_path,
     redis_client, seconds_until_1411
 )
 
