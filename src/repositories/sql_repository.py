@@ -1,6 +1,6 @@
-from datetime import date, timedelta
+from datetime import date
 
-from sqlalchemy import and_, desc, func, select
+from sqlalchemy import and_, desc, func, select, Date
 
 from databases.db import async_session
 from models.spimex import SpimexTradingResult
@@ -14,21 +14,22 @@ class SpimexSQLRepository(AbstractRepository):
         self.model = SpimexTradingResult
         self.session = async_session
 
-    async def get_all(self, n: int) -> list[SpimexTradingResult]:
-        """
-        Дать торги строго за дату (today - n дней).
-        Безопасно считаем целевую дату в Python, чтобы не собирать raw SQL для INTERVAL.
-        """
-        target_date: date = date.today() - timedelta(days=n)
+    async def get_all_trade_days(self, n: int) -> list[SpimexTradingResultOut]:
         async with async_session() as session:
+            dates_stmt = (
+                select(func.cast(self.model.date, Date).label("d"))
+                .distinct()
+                .order_by(desc("d"))
+                .limit(n)
+            )
+            dates = [row.d for row in (await session.execute(dates_stmt))]
             stmt = (
                 select(self.model)
-                .where(func.DATE(self.model.date) == target_date)
+                .where(func.cast(self.model.date, Date).in_(dates))
                 .order_by(desc(self.model.date))
             )
-            res = await session.execute(stmt)
-            items = list(res.scalars().all())
-            return [SpimexTradingResultOut.model_validate(it) for it in items]  # type: ignore
+            items = (await session.execute(stmt)).scalars().all()
+        return [SpimexTradingResultOut.model_validate(it) for it in items]
 
     async def get_dynamic(
         self,

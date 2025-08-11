@@ -21,3 +21,5 @@ poetry install
 cd src
 uvicorn main:app --reload
 ```
+
+Переходим на `http://localhost:8000/docs` и проверяем работу API.

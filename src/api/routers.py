@@ -15,7 +15,7 @@ async def get_last_trading_dates(
     n: int,
     repo: Annotated[SpimexSQLRepository, Depends(get_spimex_repo)],
 ):
-    result = await repo.get_all(n)
+    result = await repo.get_all_trade_days(n)
     if not result:
         return {"message": f"Нет данных за указанные {n} дней."}
     return result
