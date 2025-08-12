@@ -178,3 +178,5 @@ data
 docs/
 
 logs.txt
+
+dump.rdb
