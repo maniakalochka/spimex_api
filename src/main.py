@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from api.routers import router
-from middlwares.redis_mw import RedisCacheMiddleware
+from middlewares.redis_mw import RedisCacheMiddleware
 
 app = FastAPI()
 app.add_middleware(RedisCacheMiddleware)
@@ -15,6 +15,6 @@ if __name__ == "__main__":
     uvicorn.run(
         app=app,
         host="localhost",
-        port=8001,
+        port=8000,
         reload=True,
     )

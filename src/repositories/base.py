@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import date
 
 
 class AbstractRepository(ABC):
@@ -11,4 +12,22 @@ class AbstractRepository(ABC):
 
     @abstractmethod
     async def get_all_trade_days(self, n: int):
+        raise NotImplementedError("This method should be overridden by subclasses")
+
+    async def get_dynamic(
+        self,
+        oil_id: str,
+        delivery_type_id: str | None = None,
+        delivery_basis_id: str | None = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ):
+        raise NotImplementedError("This method should be overridden by subclasses")
+
+    async def get_trading_results(
+        self,
+        oil_id: str,
+        delivery_type_id: str | None = None,
+        delivery_basis_id: str | None = None,
+    ):
         raise NotImplementedError("This method should be overridden by subclasses")

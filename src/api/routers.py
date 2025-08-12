@@ -1,19 +1,23 @@
-from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Path
 
 from dependencies.deps import get_spimex_repo
 from repositories.sql_repository import SpimexSQLRepository
+from schemas.spimex import (
+    DynamicsRequest,
+    TradingResultsRequest,
+    SpimexTradingResultOut
+)
 
 
 router = APIRouter(prefix="/spimex", tags=["spimex"])
 
 
-@router.get("/last_trading_dates/{n}")
+@router.get("/last_trading_dates/{n}", response_model=list[SpimexTradingResultOut])
 async def get_last_trading_dates(
-    n: int,
     repo: Annotated[SpimexSQLRepository, Depends(get_spimex_repo)],
+    n: int = Path(..., ge=1, description="Количество последних торговых дней"),
 ):
     result = await repo.get_all_trade_days(n)
     if not result:
@@ -21,36 +25,22 @@ async def get_last_trading_dates(
     return result
 
 
-@router.get("/dynamics")
+@router.get("/dynamics", response_model=list[SpimexTradingResultOut])
 async def get_dynamics(
+    params: Annotated[DynamicsRequest, Depends()],
     repo: Annotated[SpimexSQLRepository, Depends(get_spimex_repo)],
-    oil_id: str,
-    delivery_type_id: str | None = None,
-    delivery_basis_id: str | None = None,
-    start_date: date | None = None,
-    end_date: date | None = None,
+
 ):
-    return await repo.get_dynamic(
-        oil_id=oil_id,
-        delivery_type_id=delivery_type_id,
-        delivery_basis_id=delivery_basis_id,
-        start_date=start_date,
-        end_date=end_date,
-    )
+    return await repo.get_dynamic(**params.model_dump())
 
 
 
-@router.get("/trading_results")
+@router.get("/trading_results", response_model=list[SpimexTradingResultOut])
 async def get_trading_results(
+    params: Annotated[TradingResultsRequest, Depends()],
     repo: Annotated[
         SpimexSQLRepository, Depends(get_spimex_repo)
     ],
-    oil_id: str,
-    delivery_type_id: str | None = None,
-    delivery_basis_id: str | None = None,
+
 ):
-    return await repo.get_trading_results(
-        oil_id=oil_id,
-        delivery_type_id=delivery_type_id,
-        delivery_basis_id=delivery_basis_id,
-    )
+    return await repo.get_trading_results(**params.model_dump())

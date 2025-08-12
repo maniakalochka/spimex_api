@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class SpimexTradingResultOut(BaseModel):
@@ -25,7 +25,7 @@ class SpimexTradingResultOut(BaseModel):
 
 
 class LastTradingDatesRequest(BaseModel):
-    n: int = Field(..., description="Количество последних торговых дней")
+    n: int = Field(..., ge=1, description="Количество последних торговых дней")
 
 
 class DynamicsRequest(BaseModel):
@@ -35,8 +35,13 @@ class DynamicsRequest(BaseModel):
     delivery_type_id: Optional[int] = Field(None, description="Тип поставки")
     delivery_basis_id: Optional[int] = Field(None, description="Базис поставки")
 
+    @model_validator(mode="after")
+    def check_dates(self):
+        if self.end_date < self.start_date:
+            raise ValueError("Дата конца периода должна быть >= даты начала")
+        return self
 
 class TradingResultsRequest(BaseModel):
-    oil_id: Optional[int] = Field(..., description="Фильтр по нефти")
+    oil_id: int = Field(..., description="Фильтр по нефти")
     delivery_type_id: Optional[int] = Field(None, description="Тип поставки")
     delivery_basis_id: Optional[int] = Field(None, description="Базис поставки")
