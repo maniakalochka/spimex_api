@@ -42,6 +42,6 @@ class DynamicsRequest(BaseModel):
         return self
 
 class TradingResultsRequest(BaseModel):
-    oil_id: int = Field(..., description="Фильтр по нефти")
+    oil_id: str = Field(..., description="Фильтр по нефти")
     delivery_type_id: Optional[int] = Field(None, description="Тип поставки")
     delivery_basis_id: Optional[int] = Field(None, description="Базис поставки")

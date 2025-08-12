@@ -9,6 +9,7 @@ load_dotenv(dotenv_path=env_path)
 
 class Settings(BaseSettings):
     DB_URL: str
+    REDIS_URL: str
 
     class Config:
         env_file = env_path

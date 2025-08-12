@@ -4,7 +4,13 @@ from datetime import datetime, time, timedelta
 import redis.asyncio as redis
 from fastapi import Request
 
-redis_client = redis.from_url("redis://localhost:6379/0", decode_responses=False)
+from core.config import settings
+
+
+redis_client = redis.from_url(
+    settings.REDIS_URL,
+    decode_responses=False
+)
 
 
 def seconds_until_1411() -> int:
