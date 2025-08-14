@@ -29,6 +29,7 @@ class SpimexSQLRepository(AbstractRepository):
                 .order_by(desc(self.model.date))
             )
             items = (await session.execute(stmt)).scalars().all()
+
         return [SpimexTradingResultOut.model_validate(it) for it in items]
 
     async def get_dynamic(
@@ -39,6 +40,7 @@ class SpimexSQLRepository(AbstractRepository):
         start_date: date | None = None,
         end_date: date | None = None,
     ) -> list[SpimexTradingResultOut]:
+
         conds = [self.model.oil_id == oil_id]
         if delivery_type_id is not None:
             conds.append(self.model.delivery_type_id == delivery_type_id)
