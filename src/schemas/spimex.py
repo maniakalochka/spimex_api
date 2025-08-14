@@ -8,16 +8,16 @@ class SpimexTradingResultOut(BaseModel):
     exchange_product_id: str
     exchange_product_name: str
     oil_id: str
-    delivery_basis_id: str | None = None
-    delivery_basis_name: str | None = None
-    delivery_type_id: str | None = None
-    volume: float | None = None
-    total: float | None = None
-    count: int | None = None
+    delivery_basis_id: str
+    delivery_basis_name: str
+    delivery_type_id: str
+    volume: float
+    total: float
+    count: int
     date: datetime
     id: int
-    created_on: datetime | None = None
-    updated_on: datetime | None = None
+    created_on: datetime
+    updated_on: datetime
 
     model_config = ConfigDict(
         from_attributes=True
