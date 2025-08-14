@@ -38,7 +38,7 @@ class SpimexSQLRepository(AbstractRepository):
         delivery_basis_id: str | None = None,
         start_date: date | None = None,
         end_date: date | None = None,
-    ) -> list[SpimexTradingResult]:
+    ) -> list[SpimexTradingResultOut]:
         conds = [self.model.oil_id == oil_id]
         if delivery_type_id is not None:
             conds.append(self.model.delivery_type_id == delivery_type_id)
@@ -61,7 +61,7 @@ class SpimexSQLRepository(AbstractRepository):
         oil_id: str,
         delivery_type_id: str | None = None,
         delivery_basis_id: str | None = None,
-    ) -> list[SpimexTradingResult]:
+    ) -> list[SpimexTradingResultOut]:
         async with async_session() as session:
             conditions = [self.model.oil_id == oil_id]
 
