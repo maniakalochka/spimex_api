@@ -14,10 +14,10 @@ class SpimexSQLRepository(AbstractRepository):
         model: type = SpimexTradingResult,
         session = async_session):
         self.model = SpimexTradingResult
-        self.session = async_session
+        self.session = async_session()
 
     async def get_all_trade_days(self, n: int) -> list[SpimexTradingResultOut]:
-        async with async_session() as session:
+        async with self.session as session:
             dates_stmt = (
                 select(func.cast(self.model.date, Date).label("d"))
                 .distinct()
@@ -52,7 +52,7 @@ class SpimexSQLRepository(AbstractRepository):
             conds.append(self.model.date >= start_date)
         if end_date is not None:
             conds.append(self.model.date <= end_date)
-        async with async_session() as session:
+        async with self.session as session:
             stmt = (
                 select(self.model).where(and_(*conds)).order_by(self.model.date.asc())
             )
@@ -66,7 +66,7 @@ class SpimexSQLRepository(AbstractRepository):
         delivery_type_id: str | None = None,
         delivery_basis_id: str | None = None,
     ) -> list[SpimexTradingResultOut]:
-        async with async_session() as session:
+        async with self.session as session:
             conditions = [self.model.oil_id == oil_id]
 
             if delivery_type_id is not None:
