@@ -1,10 +1,10 @@
-from pathlib import Path
 import asyncio
-import pytest
-from starlette.testclient import TestClient
-from sqlalchemy import text
-import gzip
 import subprocess
+from pathlib import Path
+
+import httpx
+import pytest_asyncio
+from asgi_lifespan import LifespanManager
 
 from core.config import settings
 from databases.db import async_session, engine
@@ -12,7 +12,7 @@ from main import app
 from models.base import Base
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest_asyncio.fixture(scope="function", autouse=True)
 async def prepare_db():
     assert settings.MODE == "TEST"
 
@@ -24,26 +24,29 @@ async def prepare_db():
     if not dump_path.exists():
         raise FileNotFoundError(f"Dump not found: {dump_path}")
 
-    subprocess.run(
-        f"gunzip -c {dump_path} | psql {settings.TEST_DB_URL.replace('+asyncpg', '')}",
+    cmd = f"gunzip -c {dump_path} | psql {settings.TEST_DB_URL.replace('+asyncpg', '')}"
+    await asyncio.to_thread(
+        subprocess.run,
+        cmd,
         shell=True,
         check=True,
     )
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
+
+@pytest_asyncio.fixture(scope="session")
+async def test_app():
+    async with LifespanManager(app):
+        yield app
 
 
-@pytest.fixture(scope="module")
-def client():
-    with TestClient(app, base_url="http://test") as client:
+@pytest_asyncio.fixture(scope="function")
+async def async_client(test_app):
+    transport = httpx.ASGITransport(app=test_app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
 
 
-@pytest.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function")
 async def session():
-    async with async_session() as session:
-        yield session
+    async with async_session() as s:
+        yield s
