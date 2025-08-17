@@ -13,7 +13,10 @@ ENV POETRY_VERSION=2.0.0
 RUN curl -sSL https://install.python-poetry.org | python3 - \
     && ln -s /root/.local/bin/poetry /usr/local/bin/poetry
 
+
+
 WORKDIR /app
+
 
 ENV PYTHONPATH=/app/src
 
@@ -21,7 +24,11 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
 COPY src ./src
+
+COPY db/init /app/db/init
+
 COPY run.sh /app/run.sh
 RUN chmod +x /app/run.sh
+
 
 EXPOSE 8000
