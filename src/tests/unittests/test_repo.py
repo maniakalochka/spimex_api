@@ -81,14 +81,43 @@ async def test_get_dynamic(session, oil_id: str, start_date: date, end_date: dat
 
 
 @pytest.mark.parametrize(
-    "oil_id, delivery_type_id, delivery_basis_id", [("A100", None, None)]
+    "oil_id, delivery_type_id, delivery_basis_id",
+    [("A100", None, None)],
 )
-async def test_get_trading_results(
-    oil_id: str, delivery_type_id: str | None, delivery_basis_id: str | None
-):
-    repo = SpimexSQLRepository
-    res = await repo().get_trading_results(oil_id, delivery_type_id, delivery_basis_id)
-    assert len(res) > 0
-    res = res[0].model_dump(exclude_none=True)
-    assert res.get("id") is not None
-    assert res.get("oil_id") == oil_id
+async def test_get_trading_results(oil_id: str, delivery_type_id: str | None, delivery_basis_id: str | None):
+    tbl = SpimexTradingResult.__tablename__
+    raw_sql = text(f"""
+        SELECT *
+        FROM {tbl}
+        WHERE oil_id = :oil_id
+          AND delivery_type_id  = COALESCE(CAST(:delivery_type_id  AS VARCHAR), delivery_type_id)
+          AND delivery_basis_id = COALESCE(CAST(:delivery_basis_id AS VARCHAR), delivery_basis_id)
+          AND date = (
+              SELECT MAX(date)
+              FROM {tbl}
+              WHERE oil_id = :oil_id
+                AND delivery_type_id  = COALESCE(CAST(:delivery_type_id  AS VARCHAR), delivery_type_id)
+                AND delivery_basis_id = COALESCE(CAST(:delivery_basis_id AS VARCHAR), delivery_basis_id)
+          )
+        ORDER BY date;
+    """)
+
+    repo = SpimexSQLRepository()
+    repo_res = await repo.get_trading_results(
+        oil_id=oil_id,
+        delivery_type_id=delivery_type_id,
+        delivery_basis_id=delivery_basis_id,
+    )
+    repo_ids = {r.id for r in repo_res}
+
+    async with async_session() as session:
+        rows = await session.execute(raw_sql, {
+            "oil_id": oil_id,
+            "delivery_type_id": delivery_type_id,
+            "delivery_basis_id": delivery_basis_id,
+        })
+        sql_res = rows.mappings().all()
+        sql_ids = {row["id"] for row in sql_res}
+
+    assert repo_ids == sql_ids
+    assert all(row["oil_id"] == oil_id for row in sql_res)
