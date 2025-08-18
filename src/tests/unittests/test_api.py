@@ -17,13 +17,13 @@ async def test_get_last_trading_dates(async_client) -> None:
 
 @pytest.mark.asyncio
 async def test_get_dynamics(async_client) -> None:
-    params = {"oil_id": "A100", "start_date": "2024-06-01", "end_date": "2024-06-02"}
+    params = {"oil_id": "A100", "start_date": "2024-06-01", "end_date": "2024-06-03"}
     response = await async_client.get("/spimex/dynamics", params=params)
     logger.info("Response status: %s, body: %s", response.status_code, response.text)
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
-
+    assert "date" in data[0]
 
 @pytest.mark.asyncio
 async def test_get_trading_results(async_client) -> None:
@@ -33,3 +33,4 @@ async def test_get_trading_results(async_client) -> None:
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
+    assert "date" in data[0]
