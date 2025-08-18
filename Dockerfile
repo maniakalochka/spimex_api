@@ -20,14 +20,13 @@ WORKDIR /app
 
 ENV PYTHONPATH=/app/src
 
-COPY pyproject.toml poetry.lock ./
+COPY . /app/
+
+# COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
-COPY src ./src
 
-COPY db/init /app/db/init
 
-COPY run.sh /app/run.sh
 RUN chmod +x /app/run.sh
 
 

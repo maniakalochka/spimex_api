@@ -6,6 +6,8 @@
 git clone https://github.com/maniakalochka/spimex_api.git
 cd spimex_api
 docker compose up --build
+docker compose exec spimex_web poetry run alembic revision --autogenerate -m "new table name"
+docker compose exec spimex_web poetry run alembic upgrade head
 ```
 
 Переходим на `http://localhost:8000/docs` и проверяем работу API.
