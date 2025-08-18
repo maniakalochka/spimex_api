@@ -20,8 +20,6 @@ async def get_last_trading_dates(
     n: int = Path(..., ge=1, description="Количество последних торговых дней"),
 ):
     result = await repo.get_all_trade_days(n)
-    if not result:
-        return {"message": f"Нет данных за указанные {n} дней."}
     return result
 
 

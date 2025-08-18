@@ -10,7 +10,8 @@ from .base import AbstractRepository
 
 
 class SpimexSQLRepository(AbstractRepository):
-    def __init__(self,
+    def __init__(
+        self,
         model: type = SpimexTradingResult,
         session = async_session):
         self.model = SpimexTradingResult
