@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, HTTPException
 
 from dependencies.deps import get_spimex_repo
 from repositories.sql_repository import SpimexSQLRepository
@@ -20,6 +20,8 @@ async def get_last_trading_dates(
     n: int = Path(..., ge=1, description="Количество последних торговых дней"),
 ):
     result = await repo.get_all_trade_days(n)
+    if not result:
+        raise HTTPException(status_code=404, detail="No trading dates found")
     return result
 
 
@@ -29,7 +31,10 @@ async def get_dynamics(
     repo: Annotated[SpimexSQLRepository, Depends(get_spimex_repo)],
 
 ):
-    return await repo.get_dynamic(**params.model_dump())
+    result = await repo.get_dynamic(**params.model_dump())
+    if not result:
+        raise HTTPException(status_code=404, detail="No dynamics found for the given parameters")
+    return result
 
 
 
@@ -41,4 +46,7 @@ async def get_trading_results(
     ],
 
 ):
-    return await repo.get_trading_results(**params.model_dump())
+    result = await repo.get_trading_results(**params.model_dump())
+    if not result:
+        raise HTTPException(status_code=404, detail="No trading results found for the given parameters")
+    return result
