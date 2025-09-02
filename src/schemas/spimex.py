@@ -19,9 +19,7 @@ class SpimexTradingResultOut(BaseModel):
     created_on: datetime
     updated_on: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True
-    )
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LastTradingDatesRequest(BaseModel):
@@ -40,6 +38,7 @@ class DynamicsRequest(BaseModel):
         if self.end_date < self.start_date:
             raise ValueError("Дата конца периода должна быть >= даты начала")
         return self
+
 
 class TradingResultsRequest(BaseModel):
     oil_id: str = Field(..., description="Фильтр по нефти")

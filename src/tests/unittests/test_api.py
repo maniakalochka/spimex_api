@@ -4,6 +4,7 @@ import pytest
 
 logger = logging.getLogger(__name__)
 
+
 # TODO добавить параметризацию и assert на 404
 @pytest.mark.asyncio
 async def test_get_last_trading_dates(async_client) -> None:
@@ -25,6 +26,7 @@ async def test_get_dynamics(async_client) -> None:
     data = response.json()
     assert isinstance(data, list)
     assert "date" in data[0]
+
 
 # TODO добавить параметризацию и assert на 404
 @pytest.mark.asyncio

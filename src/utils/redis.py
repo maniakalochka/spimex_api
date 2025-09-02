@@ -6,11 +6,7 @@ from fastapi import Request
 
 from core.config import settings
 
-
-redis_client = redis.from_url(
-    settings.REDIS_URL,
-    decode_responses=False
-)
+redis_client = redis.from_url(settings.REDIS_URL, decode_responses=False)
 
 
 def seconds_until_1411() -> int:

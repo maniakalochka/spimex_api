@@ -6,10 +6,7 @@ from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
-from utils.redis import (
-    _cache_key,
-    redis_client, seconds_until_1411
-)
+from utils.redis import _cache_key, redis_client, seconds_until_1411
 
 logger = logging.getLogger(__name__)
 

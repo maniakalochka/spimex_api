@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import and_, desc, func, select, Date
+from sqlalchemy import Date, and_, desc, func, select
 
 from databases.db import async_session
 from models.spimex import SpimexTradingResult
@@ -10,10 +10,7 @@ from .base import AbstractRepository
 
 
 class SpimexSQLRepository(AbstractRepository):
-    def __init__(
-        self,
-        model: type = SpimexTradingResult,
-        session = async_session):
+    def __init__(self, model: type = SpimexTradingResult, session=async_session):
         self.model = SpimexTradingResult
         self.session = async_session()
 
