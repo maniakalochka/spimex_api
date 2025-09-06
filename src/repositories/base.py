@@ -15,6 +15,7 @@ class AbstractRepository(ABC):
     async def get_all_trade_days(self, n: int):
         raise NotImplementedError("This method should be overridden by subclasses")
 
+    @abstractmethod
     async def get_dynamic(
         self,
         oil_id: str,
@@ -25,6 +26,7 @@ class AbstractRepository(ABC):
     ):
         raise NotImplementedError("This method should be overridden by subclasses")
 
+    @abstractmethod
     async def get_trading_results(
         self,
         oil_id: str,
