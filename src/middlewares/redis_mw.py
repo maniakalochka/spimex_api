@@ -43,7 +43,7 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
                 await redis_client.set(
                     key, orjson.dumps(payload), ex=seconds_until_1411()
                 )
-            except Exception as e:
+            except orjson.JSONDecodeError as e:
                 logger.warning("Redis write error (%s): %s", key, e)
 
             headers = dict(response.headers)
