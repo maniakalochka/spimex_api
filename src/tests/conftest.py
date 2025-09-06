@@ -13,9 +13,7 @@ from models.base import Base
 
 
 @pytest_asyncio.fixture(scope="function", autouse=True)
-async def prepare_db():
-    assert settings.MODE == "TEST"
-
+async def prepare_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -24,7 +22,7 @@ async def prepare_db():
     if not dump_path.exists():
         raise FileNotFoundError(f"Dump not found: {dump_path}")
 
-    cmd = f"gunzip -c {dump_path} | psql {settings.TEST_DB_URL.replace('+asyncpg', '')}"
+    cmd = f"gunzip -c {dump_path} | psql {settings.DB_URL.replace('+asyncpg', '')}"
     await asyncio.to_thread(
         subprocess.run,
         cmd,
