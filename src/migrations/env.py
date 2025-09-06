@@ -5,14 +5,12 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from core.config import settings
 from models.base import Base
-from models.spimex import SpimexTradingResult
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-# Настройка логирования
+
 config = context.config
 
 config.set_main_option("sqlalchemy.url", settings.TEST_DB_URL)
