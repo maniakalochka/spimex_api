@@ -22,10 +22,6 @@ class SpimexTradingResultOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class LastTradingDatesRequest(BaseModel):
-    n: int = Field(..., ge=1, description="Количество последних торговых дней")
-
-
 class DynamicsRequest(BaseModel):
     start_date: date = Field(..., description="Дата начала периода")
     end_date: date = Field(..., description="Дата конца периода")
