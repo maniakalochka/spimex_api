@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Literal
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
@@ -10,9 +9,6 @@ load_dotenv(dotenv_path=env_path)
 
 class Settings(BaseSettings):
     DB_URL: str
-    TEST_DB_URL: str
-
-    MODE: Literal["PROD", "TEST"] = "TEST"
 
     REDIS_URL: str
 
