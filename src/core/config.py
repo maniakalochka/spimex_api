@@ -15,17 +15,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_PORT: str
-
-    APP_HOST: str
+    POSTGRES_PORT: int
 
     REDIS_HOST: str
-    REDIS_PORT: str
-
-    POSTGRES_TEST_DB: str
-    POSTGRES_TEST_USER: str
-    POSTGRES_TEST_PASSWORD: str
-    POSTGRES_TEST_PORT: int
+    REDIS_PORT: int
 
     class Config:
         env_file = env_path

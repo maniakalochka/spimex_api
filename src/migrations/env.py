@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 
 config = context.config
 
-config.set_main_option("sqlalchemy.url", settings.TEST_DB_URL)
+config.set_main_option("sqlalchemy.url", settings.DB_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
