@@ -31,7 +31,7 @@ async def prepare_db() -> None:
     )
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session", autouse=True)
 async def test_app():
     async with LifespanManager(app):
         yield app
@@ -44,7 +44,7 @@ async def async_client(test_app):
         yield client
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest_asyncio.fixture(scope="function", autouse=True)
 async def session():
     async with async_session() as s:
         yield s
