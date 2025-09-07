@@ -22,12 +22,9 @@ ENV PYTHONPATH=/app/src
 
 COPY . /app/
 
-# COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
 
-
 RUN chmod +x /app/run.sh
-
 
 EXPOSE 8000
